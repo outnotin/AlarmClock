@@ -49,7 +49,7 @@ public class Alarm {
     }
 
     public String getTimeInString(Date inputTime){
-        DateFormat dateFormat = new DateFormat();
-        return dateFormat.format("HH : mm", inputTime).toString();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("hh : mm a");
+        return dateFormat.format(inputTime).toString();
     }
 }

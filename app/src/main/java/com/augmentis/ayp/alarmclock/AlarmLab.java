@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.augmentis.ayp.alarmclock.AlarmDBSchema.AlarmTable;
 
@@ -19,17 +20,18 @@ public class AlarmLab {
 
     private static AlarmLab instance;
 
-    public static AlarmLab getInstance(Context context){
-        if(instance == null){
+    public static AlarmLab getInstance(Context context) {
+        if (instance == null) {
             instance = new AlarmLab(context);
         }
         return instance;
     }
 
-    public static ContentValues getContentValures(Alarm alarm){
+    public static ContentValues getContentValures(Alarm alarm) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(AlarmTable.Cols.UUID, alarm.getId().toString());
-        contentValues.put(AlarmTable.Cols.TIME, alarm.getTime().toString());
+        Log.d(TAG, "getContentValures: " + alarm.getTime().toString());
+        contentValues.put(AlarmTable.Cols.TIME, alarm.getTime().getTime());
         contentValues.put(AlarmTable.Cols.ISACTIVE, alarm.getTime().toString());
         return contentValues;
     }
@@ -43,21 +45,22 @@ public class AlarmLab {
         _database = alarmBaseHelper.getWritableDatabase();
     }
 
-    public Alarm getAlarmById(UUID uuid){
+    public Alarm getAlarmById(UUID uuid) {
         AlarmCursorWrapper cursor = queryAlarms(AlarmTable.Cols.UUID + " = ? ",
-                new String[]{ uuid.toString()});
-        try{
-            if (cursor.getCount() == 0){
+                new String[]{uuid.toString()});
+        try {
+            if (cursor.getCount() == 0) {
                 return null;
             }
             cursor.moveToFirst();
+            Log.d(TAG, "getAlarmById: time " + cursor.getAlarm().getTime() + " <---");
             return cursor.getAlarm();
-        }finally {
+        } finally {
             cursor.close();
         }
     }
 
-    public AlarmCursorWrapper queryAlarms(String whereClause, String[] whereArgs){
+    public AlarmCursorWrapper queryAlarms(String whereClause, String[] whereArgs) {
         Cursor cursor = _database.query(AlarmTable.NAME,
                 null,
                 whereClause,
@@ -68,38 +71,38 @@ public class AlarmLab {
         return new AlarmCursorWrapper(cursor);
     }
 
-    public List<Alarm> getAlarm(){
+    public List<Alarm> getAlarm() {
         List<Alarm> alarms = new ArrayList<>();
         AlarmCursorWrapper cursor = queryAlarms(null, null);
 
         try {
             cursor.moveToFirst();
-            while (!cursor.isAfterLast()){
+            while (!cursor.isAfterLast()) {
                 alarms.add(cursor.getAlarm());
                 cursor.moveToNext();
             }
-        }finally {
+        } finally {
             cursor.close();
         }
         return alarms;
     }
 
-    public void addAlarm(Alarm alarm){
+    public void addAlarm(Alarm alarm) {
         ContentValues contentValues = getContentValures(alarm);
         _database.insert(AlarmTable.NAME, null, contentValues);
     }
 
-    public void deleteAlarm(UUID uuid){
+    public void deleteAlarm(UUID uuid) {
         _database.delete(AlarmTable.NAME,
                 AlarmTable.Cols.UUID + " = ? ",
                 new String[]{uuid.toString()});
     }
 
-    public void updateAlarm(Alarm alarm){
+    public void updateAlarm(Alarm alarm) {
+        Log.d(TAG, "updateAlarm: update ");
         String uuid = alarm.getId().toString();
         ContentValues contentValues = getContentValures(alarm);
         _database.update(AlarmTable.NAME, contentValues, AlarmTable.Cols.UUID + " = ? ",
                 new String[]{uuid.toString()});
     }
-
 }

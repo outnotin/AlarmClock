@@ -33,6 +33,8 @@ public class AlarmFragment extends Fragment {
     private Button _saveAlarmButton;
     private Button _cancelAlarmButton;
 
+    private boolean isNewAlarm;
+
     private Alarm _alarm;
 
     public static AlarmFragment newInstance(UUID alarmId){
@@ -51,16 +53,25 @@ public class AlarmFragment extends Fragment {
 
         if(requestCode == REQUEST_TIME){
             Date time = (Date) data.getSerializableExtra(TimePickerFragment.EXTRA_TIME);
+            Log.d("Activity result", "Time : " + time);
+            Log.d("Activity result", "is new : " + isNewAlarm);
             _alarmTextView.setText(_alarm.getTimeInString(time));
             _alarm.setTime(time);
+
         }
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isNewAlarm = false;
         UUID uuid = (UUID) getArguments().getSerializable(ALARM_ID);
         _alarm = AlarmLab.getInstance(getActivity()).getAlarmById(uuid);
+        if (_alarm == null) {
+            _alarm = new Alarm();
+            isNewAlarm = true;
+        }
+        Log.d("On create alarm ", _alarm.getTime().toString());
     }
 
     @Nullable
@@ -70,9 +81,8 @@ public class AlarmFragment extends Fragment {
 
         _alarmTextView = (TextView) v.findViewById(R.id.alarm_text_view);
 
-        if(_alarm == null){
-            _alarm = new Alarm();
-        }
+
+
         _alarmTextView.setText(_alarm.getTimeInString(_alarm.getTime()));
 
         _setAlarmButton = (Button) v.findViewById(R.id.set_alarm);
@@ -94,10 +104,16 @@ public class AlarmFragment extends Fragment {
 
                 //check if id is already in AlarmLab
                 //if id is not in AlarmLab
-                AlarmLab.getInstance(getActivity()).addAlarm(_alarm);
+                //
 
                 //if id is already exist
-                //AlarmLab.getInstance(getActivity()).updateAlarm(_alarm);
+                //
+
+                if(isNewAlarm){
+                    AlarmLab.getInstance(getActivity()).addAlarm(_alarm);
+                }else{
+                    AlarmLab.getInstance(getActivity()).updateAlarm(_alarm);
+                }
 
                 Intent intent = new Intent(getContext(), AlarmListActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

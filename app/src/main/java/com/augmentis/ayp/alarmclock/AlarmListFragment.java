@@ -63,8 +63,6 @@ public class AlarmListFragment extends Fragment{
 
         updateUI();
 
-        Log.d("ALARMLIST", "----------------------------ALARMLIST-----------------------------------");
-
         return v;
     }
 
@@ -93,7 +91,6 @@ public class AlarmListFragment extends Fragment{
     public void onResume() {
         super.onResume();
         updateUI();
-        Log.d("ALARMLIST", "------on pause-------");
     }
 
 
@@ -129,9 +126,9 @@ public class AlarmListFragment extends Fragment{
 
         public void bind(final Alarm alarm, int position){
             _alarm = alarm;
-//            _timeTextView.setText(_alarm.getTimeInString(_alarm.getTime()));
-            _timeTextView.setText(_alarm.getTime().toString());
-            Log.d("ALARMLIST", "-------->" + _alarm.getTime().toString());
+            _timeTextView.setText(_alarm.getTimeInString(_alarm.getTime()));
+//            _timeTextView.setText(_alarm.getTime().toString());
+            Log.d("ALARMLIST", "-------->" + _alarm.getTimeInString(_alarm.getTime()));
             _isActive.setChecked(_alarm.isActive());
             _isActive.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override

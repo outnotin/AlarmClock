@@ -24,8 +24,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
 
         setContentView(getLayoutResId());
 
-        Log.d("ALARMLIST", "Single fragment");
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
 
